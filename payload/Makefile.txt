@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+# export PS5_PAYLOAD_SDK=.../ps5-payload-sdk; make        -> the three payloads
+# make linux_test: the same on Linux under ./test-root (no SDK)
+ifdef PS5_PAYLOAD_SDK
+    include $(PS5_PAYLOAD_SDK)/toolchain/prospero.mk
+endif
+all: safe_connect.elf safe_connect_unblock.elf safe_connect_check.elf
+safe_connect.elf: safe_connect.c
+	$(CC) -O2 -Wall -DSC_MODE=1 -o $@ $<
+safe_connect_unblock.elf: safe_connect.c
+	$(CC) -O2 -Wall -DSC_MODE=2 -o $@ $<
+safe_connect_check.elf: safe_connect.c
+	$(CC) -O2 -Wall -DSC_MODE=0 -o $@ $<
+linux_test: safe_connect.c
+	for m in 0 1 2; do gcc -O2 -Wall -Wno-format-truncation -DSC_LINUX_TEST -DSC_MODE=$$m -o sc_test_$$m $<; done
+clean:
+	rm -f *.elf sc_test_*
