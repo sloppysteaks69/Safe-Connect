@@ -1,0 +1,7 @@
+*.exe
+*.elf
+*.res
+*.log
+sc_test_*
+test-root/
+__pycache__/
